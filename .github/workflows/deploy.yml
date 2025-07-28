@@ -85,7 +85,7 @@ jobs:
     needs: build-and-push
     steps:
       - name: Set up SSH agent
-        uses: webfactory/ssh-agent@v0.9.0
+        uses: webfactory/ssh-agent@v0.9.1
         with:
           ssh-private-key: ${{ secrets.CICD_PRIVATE_KEY }}
 
@@ -96,9 +96,8 @@ jobs:
       # TEMP DEBUG: Test SSH connection with verbose output and force agent usage
       - name: Test SSH connection
         run: |
-          echo "SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
           ssh-add -l
-          ssh -vvv -o "IdentityFile=none" -o "IdentitiesOnly=yes" -o "IdentityAgent=$SSH_AUTH_SOCK" -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.remote_server }} "echo 'SSH connection successful'"
+          ssh -vvv -o "IdentityFile=none" -o "IdentitiesOnly=yes" -o  -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.remote_server }} "echo 'SSH connection successful'"
 
       - name: Deploy to remote server
         run: |
