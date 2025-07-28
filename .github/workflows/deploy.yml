@@ -62,7 +62,7 @@ jobs:
           # Replace slashes in branch name to avoid invalid tag names
           SAFE_BRANCH=$(echo "${{ github.event.inputs.branch }}" | tr '/' '-')
           TAG="${SAFE_BRANCH}-${SHORT_SHA}"
-          echo "image_tag=${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_REPO }}:${TAG}" >> $GITHUB_OUTPUT
+          echo "image_tag=${{ env.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_REPO }}:${TAG}" >> $GITHUB_OUTPUT
 
       # Build and push Docker image
       - name: Build and push Docker image
