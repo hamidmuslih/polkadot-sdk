@@ -18,7 +18,7 @@ on:
 env:
   DOCKERHUB_USERNAME: chainsafeinfra
   DOCKERHUB_REPO: parity
-  DOCKERFILE_PATH: ./docker/dockerfiles/polkadot/polkadot_builder.Dockerfile
+  DOCKERFILE_PATH: ./docker/dockerfiles/polkadot/custom_polkadot_builder.Dockerfile
   CONTAINER_NAME: polkadot-nginx
   REMOTE_USER: devops
 
@@ -78,6 +78,8 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             VCS_REF=${{ github.ref }}
+            POLKADOT_REPO=https://github.com/ChainSafe/polkadot-sdk.git
+            POLKADOT_BRANCH=${{ github.event.inputs.branch }}
 
       # Print deployment info
       - name: Print deployment info
