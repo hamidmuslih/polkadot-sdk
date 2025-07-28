@@ -77,7 +77,7 @@ jobs:
       # Print deployment info
       - name: Print deployment info
         run: |
-          echo "Image built and pushed: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_REPO }}:${{ github.sha }}"
+          echo "Image built and pushed: ${{ steps.set_tag.outputs.image_tag }}"
           echo "Target server: ${{ github.event.inputs.remote_server }}"
 
   deploy:
@@ -93,15 +93,17 @@ jobs:
       - name: List loaded SSH keys
         run: ssh-add -l
 
-      # TEMP DEBUG: Test SSH connection with verbose output
+      # TEMP DEBUG: Test SSH connection with verbose output and force agent usage
       - name: Test SSH connection
         run: |
-          ssh -v -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.remote_server }} "echo 'SSH connection successful'"
+          echo "SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
+          ssh-add -l
+          ssh -v -o "IdentitiesOnly=yes" -o "IdentityAgent=$SSH_AUTH_SOCK" -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.remote_server }} "echo 'SSH connection successful'"
 
       - name: Deploy to remote server
         run: |
           echo "Deploying image ${{ needs.build-and-push.outputs.image_tag }} to ${{ github.event.inputs.remote_server }}"
-          ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.remote_server }} "
+          ssh -o "IdentitiesOnly=yes" -o "IdentityAgent=$SSH_AUTH_SOCK" -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.remote_server }} "
             docker pull ${{ needs.build-and-push.outputs.image_tag }} &&
             docker stop ${{ env.CONTAINER_NAME }} || true &&
             docker rm ${{ env.CONTAINER_NAME }} || true &&
