@@ -99,7 +99,7 @@ jobs:
       # TEMP DEBUG: Test SSH connection with verbose output
       - name: Test SSH connection
         run: |
-          ssh -v -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.remote_server }} "echo 'SSH connection successful'"
+          ssh -v -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.remote_server }} "echo 'SSH connection successful'"
 
       - name: Deploy to remote server
         env:
