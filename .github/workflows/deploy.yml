@@ -98,7 +98,7 @@ jobs:
         run: |
           echo "SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
           ssh-add -l
-          ssh -v -o "IdentitiesOnly=yes" -o "IdentityAgent=$SSH_AUTH_SOCK" -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.remote_server }} "echo 'SSH connection successful'"
+          ssh -v -o "IdentityFile=none" -o "IdentitiesOnly=yes" -o "IdentityAgent=$SSH_AUTH_SOCK" -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.remote_server }} "echo 'SSH connection successful'"
 
       - name: Deploy to remote server
         run: |
