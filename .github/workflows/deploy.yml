@@ -74,6 +74,8 @@ jobs:
           tags: ${{ steps.set_tag.outputs.image_tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            VCS_REF=${{ github.ref }}
 
       # Print deployment info
       - name: Print deployment info
