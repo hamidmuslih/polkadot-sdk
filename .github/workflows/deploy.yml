@@ -18,7 +18,7 @@ on:
 env:
   DOCKERHUB_USERNAME: chainsafeinfra
   DOCKERHUB_REPO: parity
-  DOCKERFILE_PATH: ./docker/dockerfiles/polkadot/nginx.Dockerfile
+  DOCKERFILE_PATH: ./docker/dockerfiles/polkadot/polkadot_builder.Dockerfile
   CONTAINER_NAME: polkadot-nginx
   REMOTE_USER: devops
 
@@ -104,15 +104,15 @@ jobs:
         run: |
           ssh -vvv  -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.remote_server }} "echo 'SSH connection successful'"
 
-      - name: Deploy to remote server
-        run: |
-          echo "Deploying image ${{ needs.build-and-push.outputs.image_tag }} to ${{ github.event.inputs.remote_server }}"
-          ssh -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.remote_server }} "
-            docker pull ${{ needs.build-and-push.outputs.image_tag }} &&
-            docker stop ${{ env.CONTAINER_NAME }} || true &&
-            docker rm ${{ env.CONTAINER_NAME }} || true &&
-            docker run -d --name ${{ env.CONTAINER_NAME }} -p 8000:80 ${{ needs.build-and-push.outputs.image_tag }}
-          "
+      # - name: Deploy to remote server
+      #   run: |
+      #     echo "Deploying image ${{ needs.build-and-push.outputs.image_tag }} to ${{ github.event.inputs.remote_server }}"
+      #     ssh -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.remote_server }} "
+      #       docker pull ${{ needs.build-and-push.outputs.image_tag }} &&
+      #       docker stop ${{ env.CONTAINER_NAME }} || true &&
+      #       docker rm ${{ env.CONTAINER_NAME }} || true &&
+      #       docker run -d --name ${{ env.CONTAINER_NAME }} -p 8000:80 ${{ needs.build-and-push.outputs.image_tag }}
+      #     "
 
 
 
