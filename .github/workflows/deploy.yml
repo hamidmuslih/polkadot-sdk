@@ -89,7 +89,17 @@ jobs:
         run: |
           eval "$(ssh-agent -s)"
           echo "$CICD_PRIVATE_KEY" | ssh-add -
-      
+          # TEMP DEBUG: List loaded SSH keys
+          ssh-add -l
+          # TEMP DEBUG: Show .ssh directory and known_hosts if present
+          ls -lah ~/.ssh || true
+          cat ~/.ssh/known_hosts || true
+
+      # TEMP DEBUG: Test SSH connection with verbose output
+      - name: Test SSH connection
+        run: |
+          ssh -v -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.remote_server }} "echo 'SSH connection successful'"
+
       - name: Deploy to remote server
         run: |
           echo "Deploying image ${{ needs.build-and-push.outputs.image_tag }} to ${{ github.event.inputs.remote_server }}"
