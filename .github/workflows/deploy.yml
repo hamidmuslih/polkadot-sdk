@@ -13,6 +13,7 @@ on:
         description: 'Remote server to deploy to'
         required: true
         type: string
+        default: '145.239.2.149'
 
 env:
   DOCKERHUB_REPO: parity
