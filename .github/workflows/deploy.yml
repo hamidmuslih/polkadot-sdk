@@ -4,6 +4,7 @@ name: Docker Build & Deploy
 on:
   workflow_dispatch:
     inputs:
+      # CI inputs
       branch:
         description: 'Branch to build from'
         required: true
@@ -14,11 +15,27 @@ on:
         required: true
         type: string
         default: 'cargo build --locked --release -p polkadot'
-      remote_server:
-        description: 'Remote server to deploy to'
+      # CD inputs
+      chain:
+        description: 'Select the chain to deploy'
         required: true
-        type: string
-        default: '145.239.2.149'
+        default: 'westend'
+        type: choice
+        options:
+          - paseo
+          - westend
+          - polkadot
+      instance:
+        description: 'Instance to deploy to'
+        required: true
+        default: ''
+        type: choice 
+        options:
+          - hetzner-gossamer-westend
+          - hetzner-gossamer-paseo
+          - hetzner-gossamer-westend-2
+          - hetzner-gossamer-paseo-2
+          - hetzner-gossamer-polkadot 
 
 env:
   DOCKERHUB_USERNAME: chainsafeinfra
@@ -60,7 +77,7 @@ jobs:
       # Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        
+
       # Set Docker image tag
       - name: Set Docker image tag
         id: set_tag
@@ -99,8 +116,8 @@ jobs:
 
       # - name: Deploy to remote server
       #   run: |
-      #     echo "Deploying image ${{ needs.build-and-push.outputs.image_tag }} to ${{ github.event.inputs.remote_server }}"
-      #     ssh -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.remote_server }} "
+      #     echo "Deploying image ${{ needs.build-and-push.outputs.image_tag }} to ${{ github.event.inputs.instance }}"
+      #     ssh -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.instance }} "
       #       docker pull ${{ needs.build-and-push.outputs.image_tag }} &&
       #       docker stop ${{ env.CONTAINER_NAME }} || true &&
       #       docker rm ${{ env.CONTAINER_NAME }} || true &&
