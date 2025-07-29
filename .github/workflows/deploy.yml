@@ -9,6 +9,11 @@ on:
         required: true
         default: 'master'
         type: string
+      build-cmd:
+        description: 'CI build command'
+        required: true
+        type: string
+        default: 'cargo build --locked --release -p polkadott'
       remote_server:
         description: 'Remote server to deploy to'
         required: true
@@ -52,10 +57,6 @@ jobs:
           username: ${{ env.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Set up Docker Buildx
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       # Set Docker image tag
       - name: Set Docker image tag
         id: set_tag
@@ -80,12 +81,8 @@ jobs:
             VCS_REF=${{ github.ref }}
             POLKADOT_REPO=https://github.com/ChainSafe/polkadot-sdk.git
             POLKADOT_BRANCH=${{ github.event.inputs.branch }}
+            CARGO_BUILD_CMD=${{ github.event.inputs.build-cmd }}
 
-      # Print deployment info
-      - name: Print deployment info
-        run: |
-          echo "Image built and pushed: ${{ steps.set_tag.outputs.image_tag }}"
-          echo "Target server: ${{ github.event.inputs.remote_server }}"
 
   deploy:
     runs-on: ubuntu-latest
