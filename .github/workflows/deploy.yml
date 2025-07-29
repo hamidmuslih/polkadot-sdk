@@ -13,7 +13,7 @@ on:
         description: 'CI build command'
         required: true
         type: string
-        default: 'cargo build --locked --release -p polkadott'
+        default: 'cargo build --locked --release -p polkadot'
       remote_server:
         description: 'Remote server to deploy to'
         required: true
@@ -56,7 +56,11 @@ jobs:
         with:
           username: ${{ env.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
+      
+      # Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
       # Set Docker image tag
       - name: Set Docker image tag
         id: set_tag
