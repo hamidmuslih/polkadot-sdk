@@ -6,18 +6,18 @@ on:
     inputs:
       # CI inputs
       branch:
-        description: 'Branch to build from'
+        description: 'CI - Branch to build from'
         required: true
         default: 'master'
         type: string
       build-cmd:
-        description: 'CI build command'
+        description: 'CI - build command'
         required: true
         type: string
         default: 'cargo build --locked --release -p polkadot'
       # CD inputs
       chain:
-        description: 'Select the chain to deploy'
+        description: 'CD - Select the chain to deploy'
         required: true
         default: 'polkadot'
         type: choice
@@ -26,7 +26,7 @@ on:
           - westend
           - polkadot
       instance:
-        description: 'Instance to deploy to'
+        description: 'CD - Instance to deploy to'
         required: true
         default: ''
         type: choice 
@@ -35,9 +35,10 @@ on:
           - hetzner-gossamer-paseo
           - hetzner-gossamer-westend-2
           - hetzner-gossamer-paseo-2
-          - hetzner-gossamer-polkadot 
+          - hetzner-gossamer-polkadot
+          - "145.239.2.149"
       extra_args:
-        description: 'Extra arguments for Polkadot'
+        description: 'CD -Extra arguments for Polkadot'
         required: false
         default: '--state-pruning 256 --blocks-pruning 256 --database rocksdb'
         type: string
@@ -140,8 +141,8 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.instance }} "mkdir -p /home/${{ env.REMOTE_USER }}/parity-data/data"
           ssh -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.instance }} "
             docker pull ${{ needs.build-and-push.outputs.image_tag }} &&
-            docker compose -f docker-compose.yml down || true &&
-            docker compose -f docker-compose.yml up -d
+            # docker compose -f docker-compose.yml down || true &&
+            # docker compose -f docker-compose.yml up -d
           "
 
 
