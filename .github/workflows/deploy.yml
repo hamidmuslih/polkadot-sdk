@@ -38,7 +38,7 @@ on:
           - hetzner-gossamer-polkadot
           - "145.239.2.149"
       extra_args:
-        description: 'CD -Extra arguments for Polkadot'
+        description: 'CD - Extra arguments for Parity node'
         required: false
         default: '--state-pruning 256 --blocks-pruning 256 --database rocksdb'
         type: string
@@ -48,7 +48,6 @@ env:
   DOCKERHUB_REPO: parity
   DOCKERFILE_PATH: ./docker/dockerfiles/polkadot/custom_polkadot_builder.Dockerfile
   DOCKER_COMPOSE_FILE: ./docker/dockerfiles/polkadot/custom-docker-compose.yml
-  CONTAINER_NAME: polkadot-nginx
   REMOTE_USER: devops
 
 jobs:
@@ -116,6 +115,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-and-push
     steps:
+      # Checkout the specified branch
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
       - name: Set up SSH agent
         uses: webfactory/ssh-agent@v0.9.0
         with:
@@ -123,6 +127,8 @@ jobs:
 
       - name: Prepare docker-compose file with workflow inputs
         run: |
+          # TEMP: List files for debug
+          ls -lah ./
           export IMAGE_TAG="${{ needs.build-and-push.outputs.image_tag }}"
           export REMOTE_USER="${{ env.REMOTE_USER }}"
           export CHAIN="${{ github.event.inputs.chain }}"
