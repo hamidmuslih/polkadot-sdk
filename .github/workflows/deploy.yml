@@ -19,7 +19,7 @@ on:
       chain:
         description: 'Select the chain to deploy'
         required: true
-        default: 'westend'
+        default: 'polkadot'
         type: choice
         options:
           - paseo
@@ -36,11 +36,17 @@ on:
           - hetzner-gossamer-westend-2
           - hetzner-gossamer-paseo-2
           - hetzner-gossamer-polkadot 
+      extra_args:
+        description: 'Extra arguments for Polkadot'
+        required: false
+        default: '--state-pruning 256 --blocks-pruning 256 --database rocksdb'
+        type: string
 
 env:
   DOCKERHUB_USERNAME: chainsafeinfra
   DOCKERHUB_REPO: parity
   DOCKERFILE_PATH: ./docker/dockerfiles/polkadot/custom_polkadot_builder.Dockerfile
+  DOCKER_COMPOSE_FILE: ./docker/dockerfiles/polkadot/custom-docker-compose.yml
   CONTAINER_NAME: polkadot-nginx
   REMOTE_USER: devops
 
@@ -114,15 +120,29 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.CICD_PRIVATE_KEY }}
 
-      # - name: Deploy to remote server
-      #   run: |
-      #     echo "Deploying image ${{ needs.build-and-push.outputs.image_tag }} to ${{ github.event.inputs.instance }}"
-      #     ssh -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.instance }} "
-      #       docker pull ${{ needs.build-and-push.outputs.image_tag }} &&
-      #       docker stop ${{ env.CONTAINER_NAME }} || true &&
-      #       docker rm ${{ env.CONTAINER_NAME }} || true &&
-      #       docker run -d --name ${{ env.CONTAINER_NAME }} -p 8000:80 ${{ needs.build-and-push.outputs.image_tag }}
-      #     "
+      - name: Prepare docker-compose file with workflow inputs
+        run: |
+          export IMAGE_TAG="${{ needs.build-and-push.outputs.image_tag }}"
+          export REMOTE_USER="${{ env.REMOTE_USER }}"
+          export CHAIN="${{ github.event.inputs.chain }}"
+          export INSTANCE="${{ github.event.inputs.instance }}"
+          export EXTRA_ARGS="${{ github.event.inputs.extra_args }}"
+          envsubst < ${{ env.DOCKER_COMPOSE_FILE }} > ./custom-docker-compose.final.yml
+          #temp
+          cat ./custom-docker-compose.final.yml
+
+      - name: Copy docker-compose file to remote server
+        run: |
+          scp -o StrictHostKeyChecking=no ./custom-docker-compose.final.yml ${{ env.REMOTE_USER }}@${{ github.event.inputs.instance }}:/home/${{ env.REMOTE_USER }}/docker-compose.yml
+
+      - name: Deploy with Docker Compose
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.instance }} "mkdir -p /home/${{ env.REMOTE_USER }}/parity-data/data"
+          ssh -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.instance }} "
+            docker pull ${{ needs.build-and-push.outputs.image_tag }} &&
+            docker compose -f docker-compose.yml down || true &&
+            docker compose -f docker-compose.yml up -d
+          "
 
 
 

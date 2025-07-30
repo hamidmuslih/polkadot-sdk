@@ -1,0 +1,38 @@
+# Variables expected: IMAGE_TAG, CHAIN, REMOTE_USER, INSTANCE, EXTRA_ARGS
+services:
+
+  polkadot-validator:
+    image: "${IMAGE_TAG}"
+    container_name: "${CHAIN}-staging-node"
+    ports:
+      - '30333:30333'
+      - '9615:9615'
+      - '9944:9944'
+      - '9933:9933'
+    volumes:
+      - "/home/${REMOTE_USER}/parity-data/data:/data"
+    environment:
+      {}
+    user: "0:0"
+    command: >-
+      --base-path=/data
+      --chain ${CHAIN}
+      --name Chainsafe-${CHAIN}-staging
+      --telemetry-url "wss://telemetry.polkadot.io/submit/ 0"
+      ${EXTRA_ARGS}
+
+    networks:
+      - polkadot
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-file: '5'
+        max-size: '100m'
+    labels:
+      promtail_logging: "true"
+      instance: "${INSTANCE}"
+      network: "${CHAIN}"
+networks:
+  polkadot:
+    name: polkadot
