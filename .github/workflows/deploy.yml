@@ -36,7 +36,7 @@ on:
           - hetzner-gossamer-westend-2
           - hetzner-gossamer-paseo-2
           - hetzner-gossamer-polkadot
-          - "145.239.2.149"
+          - "145.239.2.149" # TEMP
       extra_args:
         description: 'CD - Extra arguments for Parity node'
         required: false

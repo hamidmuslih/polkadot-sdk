@@ -4,11 +4,13 @@ services:
   parity-node:
     image: "${IMAGE_TAG}"
     container_name: "${CHAIN}-staging-node"
-    ports:
-      - '30333:30333' # p2p
-      - '9615:9615'   # prometheus
-      - '9944:9944'   # rpc
-      - '9933:9933'   # ws
+    # Uncomment if you want to expose ports when not using host network
+    # ports: 
+    #   - '30333:30333' # p2p
+    #   - '9615:9615'   # prometheus
+    #   - '9944:9944'   # rpc
+    #   - '9933:9933'   # ws
+    network_mode: host
     volumes:
       - "/home/${REMOTE_USER}/parity-data/data:/data"
     environment:
@@ -21,9 +23,6 @@ services:
       --telemetry-url "wss://telemetry.polkadot.io/submit/ 0"
       --sync warp
       ${EXTRA_ARGS}
-
-    networks:
-      - polkadot
     restart: always
     logging:
       driver: "json-file"
@@ -34,6 +33,3 @@ services:
       promtail_logging: "true"
       instance: "${INSTANCE}"
       network: "${CHAIN}"
-networks:
-  polkadot:
-    name: polkadot
