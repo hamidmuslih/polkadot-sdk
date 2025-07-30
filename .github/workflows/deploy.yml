@@ -106,7 +106,7 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             VCS_REF=${{ github.ref }}
-            POLKADOT_REPO=https://github.com/ChainSafe/polkadot-sdk.git
+            POLKADOT_REPO=https://github.com/hamidmuslih/polkadot-sdk.git
             POLKADOT_BRANCH=${{ github.event.inputs.branch }}
             CARGO_BUILD_CMD=${{ github.event.inputs.build-cmd }}
 
