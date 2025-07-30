@@ -1,14 +1,14 @@
 # Variables expected: IMAGE_TAG, CHAIN, REMOTE_USER, INSTANCE, EXTRA_ARGS
 services:
 
-  polkadot-validator:
+  parity-node:
     image: "${IMAGE_TAG}"
     container_name: "${CHAIN}-staging-node"
     ports:
-      - '30333:30333'
-      - '9615:9615'
-      - '9944:9944'
-      - '9933:9933'
+      - '30333:30333' # p2p
+      - '9615:9615'   # prometheus
+      - '9944:9944'   # rpc
+      - '9933:9933'   # ws
     volumes:
       - "/home/${REMOTE_USER}/parity-data/data:/data"
     environment:
