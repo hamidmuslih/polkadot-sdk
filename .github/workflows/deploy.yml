@@ -56,6 +56,14 @@ jobs:
     outputs:
       image_tag: ${{ steps.set_tag.outputs.image_tag }}
     steps:
+      - name: Print workflow inputs
+        run: |
+          echo "running from non-default branch ${{ github.ref }}"
+          echo "branch: ${{ github.event.inputs.branch }}"
+          echo "build-cmd: ${{ github.event.inputs.build-cmd }}"
+          echo "chain: ${{ github.event.inputs.chain }}"
+          echo "instance: ${{ github.event.inputs.instance }}"
+          echo "extra_args: ${{ github.event.inputs.extra_args }}"
       # Checkout the specified branch
       - name: Checkout code
         uses: actions/checkout@v4
@@ -105,9 +113,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            VCS_REF=${{ github.ref }}
-            POLKADOT_REPO=https://github.com/hamidmuslih/polkadot-sdk.git
-            POLKADOT_BRANCH=${{ github.event.inputs.branch }}
+            TARGET_REPO=https://github.com/hamidmuslih/polkadot-sdk.git
+            TARGET_BRANCH=${{ github.event.inputs.branch }}
             CARGO_BUILD_CMD=${{ github.event.inputs.build-cmd }}
 
 

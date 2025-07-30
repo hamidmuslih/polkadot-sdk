@@ -1,16 +1,16 @@
 # This is the build stage for Polkadot. Here we create the binary in a temporary image.
 FROM docker.io/paritytech/ci-unified:bullseye-1.88.0-2025-06-27-v202507112050 as builder
 
-ARG POLKADOT_REPO=https://github.com/ChainSafe/polkadot-sdk.git
-ARG POLKADOT_BRANCH=master
+ARG TARGET_REPO=https://github.com/ChainSafe/polkadot-sdk.git
+ARG TARGET_BRANCH=master
 ARG CARGO_BUILD_CMD="cargo build --locked --release -p polkadot"
 
 WORKDIR /polkadot
 
 # Clone the ChainSafe polkadot-sdk repo (shallow) and checkout a specific branch, check success
-RUN git clone --depth 1 --branch ${POLKADOT_BRANCH} ${POLKADOT_REPO} /polkadot && \
+RUN git clone --depth 1 --branch ${TARGET_BRANCH} ${TARGET_REPO} /polkadot && \
     cd /polkadot && \
-    git rev-parse --abbrev-ref HEAD | grep -q "^${POLKADOT_BRANCH}$"
+    git rev-parse --abbrev-ref HEAD | grep -q "^${TARGET_BRANCH}$"
 
 RUN bash -c "${CARGO_BUILD_CMD}"
 
