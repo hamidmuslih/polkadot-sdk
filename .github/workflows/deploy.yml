@@ -140,15 +140,15 @@ jobs:
 
       - name: Copy docker-compose file to remote server
         run: |
+          ssh -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.instance }} "mkdir -p /home/${{ env.REMOTE_USER }}/parity-data/data"
           scp -o StrictHostKeyChecking=no ./custom-docker-compose.final.yml ${{ env.REMOTE_USER }}@${{ github.event.inputs.instance }}:/home/${{ env.REMOTE_USER }}/docker-compose.yml
 
       - name: Deploy with Docker Compose
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.instance }} "mkdir -p /home/${{ env.REMOTE_USER }}/parity-data/data"
           ssh -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ github.event.inputs.instance }} "
-            docker pull ${{ needs.build-and-push.outputs.image_tag }} &&
-            # docker compose -f docker-compose.yml down || true &&
-            # docker compose -f docker-compose.yml up -d
+          docker pull ${{ needs.build-and-push.outputs.image_tag }} &&
+          docker compose -f docker-compose.yml down || true &&
+          docker compose -f docker-compose.yml up -d
           "
 
 

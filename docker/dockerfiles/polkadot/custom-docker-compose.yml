@@ -19,6 +19,7 @@ services:
       --chain ${CHAIN}
       --name Chainsafe-${CHAIN}-staging
       --telemetry-url "wss://telemetry.polkadot.io/submit/ 0"
+      --sync warp
       ${EXTRA_ARGS}
 
     networks:
