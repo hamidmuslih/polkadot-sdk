@@ -31,22 +31,18 @@ on:
         default: ''
         type: choice 
         options:
-          - "hetzner-gossamer-westend 65.109.50.246"
-          - "hetzner-gossamer-paseo 65.109.48.170"
-          - "hetzner-gossamer-westend-2 65.109.58.186"
-          - "hetzner-gossamer-paseo-2 65.108.239.41"
-          - "hetzner-gossamer-polkadot 65.109.21.230"
+          - "hetzner-parity-westend-0 65.109.50.246"
+          - "hetzner-parity-westend-1 65.109.58.186"
+          - "hetzner-parity-paseo-0 65.109.48.170"
+          - "hetzner-parity-paseo-1 65.108.239.41"
+          - "hetzner-parity-polkadot-0 65.109.21.230"
           - "145.239.2.149 145.239.2.149" # TEMP
       extra_args:
         description: 'CD - Extra arguments for Parity node'
         required: false
         default: '--state-pruning 256 --blocks-pruning 256 --database rocksdb'
         type: string
-      test-master:
-        description: 'CD - Extra arguments for Parity node'
-        required: false
-        default: ''
-        type: string
+
 env:
   DOCKERHUB_USERNAME: chainsafeinfra
   DOCKERHUB_REPO: parity
@@ -137,14 +133,17 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.CICD_PRIVATE_KEY }}
 
-      - name: Extract instance name and IP
+      - name: Extract instance name, IP, and index
         id: extract_instance
         run: |
           INSTANCE_INPUT="${{ github.event.inputs.instance }}"
           INSTANCE_NAME=$(echo "$INSTANCE_INPUT" | awk '{print $1}')
           INSTANCE_IP=$(echo "$INSTANCE_INPUT" | awk '{print $2}')
+          # Extract index (last part after last dash)
+          INSTANCE_INDEX=$(echo "$INSTANCE_NAME" | awk -F'-' '{print $NF}')
           echo "name=$INSTANCE_NAME" >> $GITHUB_OUTPUT
           echo "ip=$INSTANCE_IP" >> $GITHUB_OUTPUT
+          echo "index=$INSTANCE_INDEX" >> $GITHUB_OUTPUT
 
       - name: Prepare docker-compose file with workflow inputs
         run: |
@@ -152,6 +151,7 @@ jobs:
           export REMOTE_USER="${{ env.REMOTE_USER }}"
           export CHAIN="${{ github.event.inputs.chain }}"
           export INSTANCE="${{ steps.extract_instance.outputs.name }}"
+          export INDEX="${{ steps.extract_instance.outputs.index }}"
           export EXTRA_ARGS="${{ github.event.inputs.extra_args }}"
           envsubst < ${{ env.DOCKER_COMPOSE_FILE }} > ./custom-docker-compose.final.yml
           #temp

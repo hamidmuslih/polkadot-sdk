@@ -19,7 +19,7 @@ services:
     command: >-
       --base-path=/data
       --chain ${CHAIN}
-      --name chainsafe-${CHAIN}-staging
+      --name chainsafe-${CHAIN}-staging-${INDEX}
       --telemetry-url "wss://telemetry.polkadot.io/submit/ 0"
       --sync warp
       ${EXTRA_ARGS}
