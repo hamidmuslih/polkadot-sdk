@@ -36,7 +36,7 @@ on:
           - "hetzner-parity-paseo-0 65.109.48.170"
           - "hetzner-parity-paseo-1 65.108.239.41"
           - "hetzner-parity-polkadot-0 65.109.21.230"
-          - "145.239.2.149 145.239.2.149" # TEMPP
+          - "145.239.2.149 145.239.2.149" # TEMP
       extra_args:
         description: 'CD - Extra arguments for Parity node'
         required: false
